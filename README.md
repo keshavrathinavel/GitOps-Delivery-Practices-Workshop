@@ -1,0 +1,1 @@
+# GitOps-Delivery-Practices-Workshop
