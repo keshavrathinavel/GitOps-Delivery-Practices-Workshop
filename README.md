@@ -61,21 +61,16 @@ gitops-workshop/
    ./setup-scripts/03-setup-database.sh
    ```
 
-3. **Optional: If you need to fix ArgoCD memory issues later:**
-   ```bash
-   ./setup-scripts/02a-fix-argocd-memory.sh
-   ```
-
 3. **Create namespaces:**
    ```bash
    kubectl create ns staging production
    ```
 
-5. **Update ArgoCD applications:**
+4. **Update ArgoCD applications:**
    - Edit `argocd-applications.yaml` to point to your GitHub repository
    - Apply the applications: `kubectl apply -f argocd-applications.yaml`
 
-6. **Access ArgoCD UI:**
+5. **Access ArgoCD UI:**
    ```bash
    kubectl port-forward svc/argocd-server -n argocd 8081:443
    ```
