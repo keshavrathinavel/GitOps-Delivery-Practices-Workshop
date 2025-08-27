@@ -1,6 +1,6 @@
-# GitOps and CloudSecOps Workshop
+# (Short) GitOps Workshop
 
-A hands-on workshop for building a multi-environment platform using GitOps principles with ArgoCD and Kubernetes.
+A short hands-on workshop for building a multi-environment platform using GitOps principles with ArgoCD and Kubernetes.
 
 ## Overview
 
@@ -95,7 +95,6 @@ For detailed step-by-step instructions, open `what-we-will-be-doing.html` in you
 - Complete setup instructions
 - Code examples with copy buttons
 - Troubleshooting tips
-- Best practices
 
 ## Architecture
 
