@@ -1,0 +1,51 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: db-pinger
+  labels:
+    app: db-pinger
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: db-pinger
+  template:
+    metadata:
+      labels:
+        app: db-pinger
+      annotations:
+        # Vault Secrets Operator annotations
+        vault.hashicorp.com/agent-inject: 'true'
+        vault.hashicorp.com/role: 'db-pinger-role'
+        vault.hashicorp.com/agent-inject-secret-database-creds.txt: 'kv/db-pinger'
+    spec:
+      serviceAccountName: db-pinger-sa
+      containers:
+      - name: db-pinger
+        image: postgres:14-alpine # Using postgres client as a pinger
+        command: ["/bin/sh", "-c"]
+        args:
+          - |
+            apk add --no-cache netcat-openbsd;
+            echo "--- Starting DB Pinger ---";
+            echo "Waiting for secrets to be injected...";
+            while [ ! -f /vault/secrets/database-creds.txt ]; do sleep 1; done;
+            echo "Secrets found!";
+
+            # Source the secrets file
+            source /vault/secrets/database-creds.txt
+
+            echo "Pinging DB host: $DB_HOST on port $DB_PORT";
+
+            # Loop forever, checking the connection
+            while true; do
+              if nc -z -w5 "$DB_HOST" "$DB_PORT"; then
+                echo "SUCCESS: Connection to $DB_HOST:$DB_PORT is open."
+              else
+                echo "FAILURE: Connection to $DB_HOST:$DB_PORT is closed."
+              fi;
+              sleep 10;
+            done
+        envFrom:
+        - configMapRef:
+            name: db-pinger-config
