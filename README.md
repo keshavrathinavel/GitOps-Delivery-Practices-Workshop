@@ -101,7 +101,5 @@ For detailed step-by-step instructions, open `what-we-will-be-doing.html` in you
 
 The workshop demonstrates a complete GitOps workflow:
 
-1. **Infrastructure Provisioning**: Crossplane manages cloud resources
-2. **Secrets Management**: Vault provides secure secret injection
-3. **Application Deployment**: ArgoCD syncs applications from Git
-4. **Environment Management**: Kustomize overlays for environment-specific configs
+1. **Application Deployment**: ArgoCD syncs applications from Git
+2. **Environment Management**: Kustomize overlays for environment-specific configs

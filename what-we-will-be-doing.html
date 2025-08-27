@@ -118,10 +118,12 @@
           <pre id="directory-structure-code" class="code-block">
 gitops-workshop/
 ├── setup-scripts/
+│   ├── 00-verify-tools.sh
 │   ├── 01-create-cluster.sh
 │   ├── 02-install-tools.sh
+│   ├── 02a-fix-argocd-memory.sh
 │   ├── 03-setup-database.sh
-│   └── 05-self-healing-demo.sh
+│   └── 04-self-healing-demo.sh
 └── infra-manifests/
     ├── database/
     │   ├── postgresql.yaml
@@ -129,7 +131,7 @@ gitops-workshop/
     └── apps/
         └── db-pinger/
             ├── base/
-            │   ├── deployment-workshop.yaml
+            │   ├── deployment.yaml
             │   ├── service.yaml
             │   ├── serviceaccount.yaml
             │   └── kustomization.yaml
@@ -169,32 +171,14 @@ set -euo pipefail
 
 CLUSTER_NAME="gitops-workshop"
 
-echo "🔥 Creating kind cluster: ${CLUSTER_NAME}"
+echo "🌐 Creating kind cluster: ${CLUSTER_NAME}"
 
-cat <<EOF | kind create cluster --name "${CLUSTER_NAME}" --config=-
-kind: Cluster
-apiVersion: kind.x-k8s.io/v1alpha4
-nodes:
-- role: control-plane
-  kubeadmConfigPatches:
-  - |
-    kind: InitConfiguration
-    nodeRegistration:
-      kubeletExtraArgs:
-        node-labels: "ingress-ready=true"
-  extraPortMappings:
-  - containerPort: 80
-    hostPort: 8080
-    protocol: TCP
-  - containerPort: 443
-    hostPort: 8443
-    protocol: TCP
-EOF
+kind create cluster --name "${CLUSTER_NAME}" --config=../kind-cluster-config.yaml
 
 echo "✅ Cluster '${CLUSTER_NAME}' created successfully."
 echo "👉 Your kubectl context is now set to 'kind-${CLUSTER_NAME}'"
-                </pre
-          >
+
+          </pre>
         </div>
 
         <!-- Script 2: Install Tools -->
@@ -230,12 +214,8 @@ kubectl patch deployment argocd-applicationset-controller -n argocd --type='json
 
 echo "✅ ArgoCD memory configuration applied!"
 
-echo "🚀 Installing Crossplane..."
-kubectl create namespace crossplane-system || true
-helm repo add crossplane-stable https://charts.crossplane.io/stable || true
-helm install crossplane --namespace crossplane-system crossplane-stable/crossplane --version 1.14.5 --wait
-
 echo "✅ All platform tools installed successfully!"
+            
                 </pre
           >
         </div>
@@ -351,9 +331,7 @@ stringData:
         <!-- App Base: Deployment -->
         <div id="app-dep">
           <div class="code-block-title">
-            <span
-              >infra-manifests/apps/db-pinger/base/deployment-workshop.yaml</span
-            >
+            <span>infra-manifests/apps/db-pinger/base/deployment.yaml</span>
             <button class="copy-button" onclick="copyCode('app-dep-code')">
               Copy
             </button>

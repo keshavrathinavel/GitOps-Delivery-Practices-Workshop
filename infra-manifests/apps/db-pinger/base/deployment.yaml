@@ -13,11 +13,6 @@ spec:
     metadata:
       labels:
         app: db-pinger
-      annotations:
-        # Vault Secrets Operator annotations
-        vault.hashicorp.com/agent-inject: 'true'
-        vault.hashicorp.com/role: 'db-pinger-role'
-        vault.hashicorp.com/agent-inject-secret-database-creds.txt: 'kv/db-pinger'
     spec:
       serviceAccountName: db-pinger-sa
       containers:
@@ -28,13 +23,12 @@ spec:
           - |
             apk add --no-cache netcat-openbsd;
             echo "--- Starting DB Pinger ---";
-            echo "Waiting for secrets to be injected...";
-            while [ ! -f /vault/secrets/database-creds.txt ]; do sleep 1; done;
-            echo "Secrets found!";
-
-            # Source the secrets file
-            source /vault/secrets/database-creds.txt
-
+            echo "Connecting to PostgreSQL database...";
+            
+            # Get database connection details from environment
+            DB_HOST="${DB_HOST:-postgresql.default.svc}"
+            DB_PORT="${DB_PORT:-5432}"
+            
             echo "Pinging DB host: $DB_HOST on port $DB_PORT";
 
             # Loop forever, checking the connection
@@ -49,3 +43,5 @@ spec:
         envFrom:
         - configMapRef:
             name: db-pinger-config
+        - secretRef:
+            name: db-pinger-conn
