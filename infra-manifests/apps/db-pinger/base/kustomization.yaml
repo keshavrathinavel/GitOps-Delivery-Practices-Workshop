@@ -6,7 +6,6 @@ resources:
 - deployment.yaml
 - service.yaml
 - db-claim.yaml
-- vault-secret.yaml # Even the secrets
 - serviceaccount.yaml
 
 configMapGenerator:
