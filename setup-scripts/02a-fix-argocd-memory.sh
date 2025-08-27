@@ -4,27 +4,6 @@ set -euo pipefail
 echo "🔧 Fixing ArgoCD Memory Issues"
 echo "=============================="
 
-echo "📋 This script applies memory limits to ArgoCD components to prevent OOM issues."
-echo ""
-
-# Check if ArgoCD is installed
-if ! kubectl get namespace argocd >/dev/null 2>&1; then
-    echo "❌ ArgoCD namespace not found. Please install ArgoCD first using 02-install-tools.sh"
-    exit 1
-fi
-
-echo "✅ ArgoCD namespace found. Proceeding with memory configuration..."
-
-# Wait for ArgoCD to be fully deployed
-echo "⏳ Waiting for ArgoCD to be ready..."
-kubectl wait --for=condition=available deployment/argocd-server -n argocd --timeout=300s
-
-echo "🔧 Applying memory limits to ArgoCD components..."
-
-# Patch StatefulSet with memory limits
-echo "  - Configuring argocd-application-controller..."
-kubectl patch statefulset argocd-application-controller -n argocd -p '{"spec":{"template":{"spec":{"containers":[{"name":"argocd-application-controller","resources":{"limits":{"memory":"512Mi","cpu":"500m"},"requests":{"memory":"256Mi","cpu":"250m"}}}]}}}}' || true
-
 # Patch Deployments with memory limits
 echo "  - Configuring argocd-repo-server..."
 kubectl patch deployment argocd-repo-server -n argocd --type='json' -p='[{"op": "replace", "path": "/spec/template/spec/containers/0/resources", "value": {"limits": {"memory": "512Mi", "cpu": "500m"}, "requests": {"memory": "256Mi", "cpu": "250m"}}}]' || true

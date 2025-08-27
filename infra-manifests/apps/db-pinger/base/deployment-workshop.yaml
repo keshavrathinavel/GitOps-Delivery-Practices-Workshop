@@ -23,11 +23,11 @@ spec:
           - |
             apk add --no-cache netcat-openbsd;
             echo "--- Starting DB Pinger ---";
-            echo "Workshop mode: Using hardcoded values for demonstration";
+            echo "Connecting to PostgreSQL database...";
             
-            # Use hardcoded values for workshop
-            DB_HOST="localhost"
-            DB_PORT="5432"
+            # Get database connection details from environment
+            DB_HOST="${DB_HOST:-postgresql.default.svc}"
+            DB_PORT="${DB_PORT:-5432}"
             
             echo "Pinging DB host: $DB_HOST on port $DB_PORT";
 
@@ -43,3 +43,5 @@ spec:
         envFrom:
         - configMapRef:
             name: db-pinger-config
+        - secretRef:
+            name: db-pinger-conn

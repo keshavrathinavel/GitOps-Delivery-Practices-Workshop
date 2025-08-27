@@ -27,7 +27,7 @@ gitops-workshop/
 ├── setup-scripts/                  # Setup automation scripts
 │   ├── 01-create-cluster.sh       # Create local Kubernetes cluster
 │   ├── 02-install-tools.sh        # Install ArgoCD, Crossplane
-│   ├── 03-configure-crossplane.sh # Configure Crossplane providers
+│   ├── 03-setup-database.sh       # Setup PostgreSQL database
 │   └── 05-self-healing-demo.sh    # Self-healing demonstration
 ├── infra-manifests/                # Infrastructure and application manifests
 │   ├── crossplane/                 # Crossplane definitions
@@ -57,8 +57,8 @@ gitops-workshop/
    # Install platform tools (includes ArgoCD memory fixes)
    ./setup-scripts/02-install-tools.sh
    
-   # Configure Crossplane
-   ./setup-scripts/03-configure-crossplane.sh
+   # Setup Database
+   ./setup-scripts/03-setup-database.sh
    ```
 
 3. **Optional: If you need to fix ArgoCD memory issues later:**
