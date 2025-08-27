@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>GitOps and CloudSecOps Workshop</title>
+    <title>GitOps Workshop</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link
       href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
@@ -73,7 +73,7 @@
     <div class="container mx-auto p-4 md:p-8">
       <header class="text-center mb-10">
         <h1 class="text-4xl font-bold text-gray-900">
-          The Declarative State: A GitOps & CloudSecOps Workshop
+          The Declarative State: A GitOps Workshop
         </h1>
         <p class="mt-2 text-lg text-gray-600">
           A hands-on guide to building a secure, multi-environment platform
@@ -85,9 +85,9 @@
         <h2 class="text-2xl font-semibold mb-4">Introduction</h2>
         <p class="mb-4">
           Welcome! This workshop will guide you through setting up a complete
-          GitOps and CloudSecOps environment on your local machine. You will
-          learn how to manage multiple environments (`staging`, `production`)
-          with minimal code duplication and handle secrets securely.
+          GitOps environment on your local machine. You will learn how to manage
+          multiple environments (`staging`, `production`) with minimal code
+          duplication using GitOps principles.
         </p>
         <p>
           The entire "Git repository" for this workshop is simulated by the file
@@ -117,11 +117,11 @@
           </div>
           <pre id="directory-structure-code" class="code-block">
 gitops-workshop/
-├── setup/
+├── setup-scripts/
 │   ├── 01-create-cluster.sh
 │   ├── 02-install-tools.sh
-│   ├── 03-configure-vault.sh
-│   └── 04-configure-crossplane.sh
+│   ├── 03-configure-crossplane.sh
+│   └── 05-self-healing-demo.sh
 └── infra-manifests/
     ├── crossplane/
     │   ├── provider-config.yaml
@@ -129,10 +129,10 @@ gitops-workshop/
     └── apps/
         └── db-pinger/
             ├── base/
-            │   ├── deployment.yaml
+            │   ├── deployment-workshop.yaml
             │   ├── service.yaml
             │   ├── db-claim.yaml
-            │   ├── vault-secret.yaml
+            │   ├── serviceaccount.yaml
             │   └── kustomization.yaml
             └── overlays/
                 ├── staging/
@@ -159,7 +159,7 @@ gitops-workshop/
         <!-- Script 1: Create Cluster -->
         <div id="script1">
           <div class="code-block-title">
-            <span>setup/01-create-cluster.sh</span>
+            <span>setup-scripts/01-create-cluster.sh</span>
             <button class="copy-button" onclick="copyCode('script1-code')">
               Copy
             </button>
@@ -201,7 +201,7 @@ echo "👉 Your kubectl context is now set to 'kind-${CLUSTER_NAME}'"
         <!-- Script 2: Install Tools -->
         <div id="script2">
           <div class="code-block-title">
-            <span>setup/02-install-tools.sh</span>
+            <span>setup-scripts/02-install-tools.sh</span>
             <button class="copy-button" onclick="copyCode('script2-code')">
               Copy
             </button>
@@ -215,80 +215,41 @@ kubectl create namespace argocd || true
 helm repo add argo https://argoproj.github.io/argo-helm || true
 helm install argocd argo/argo-cd -n argocd --version 5.52.0 --wait
 
+echo "🔧 Configuring ArgoCD memory limits to prevent OOM issues..."
+# Wait for ArgoCD to be fully deployed
+kubectl wait --for=condition=available deployment/argocd-server -n argocd --timeout=300s
+
+# Patch StatefulSet with memory limits
+kubectl patch statefulset argocd-application-controller -n argocd -p '{"spec":{"template":{"spec":{"containers":[{"name":"argocd-application-controller","resources":{"limits":{"memory":"512Mi","cpu":"500m"},"requests":{"memory":"256Mi","cpu":"250m"}}}]}}}}' || true
+
+# Patch Deployments with memory limits
+kubectl patch deployment argocd-repo-server -n argocd --type='json' -p='[{"op": "replace", "path": "/spec/template/spec/containers/0/resources", "value": {"limits": {"memory": "512Mi", "cpu": "500m"}, "requests": {"memory": "256Mi", "cpu": "250m"}}}]' || true
+
+kubectl patch deployment argocd-server -n argocd --type='json' -p='[{"op": "replace", "path": "/spec/template/spec/containers/0/resources", "value": {"limits": {"memory": "512Mi", "cpu": "500m"}, "requests": {"memory": "256Mi", "cpu": "250m"}}}]' || true
+
+kubectl patch deployment argocd-applicationset-controller -n argocd --type='json' -p='[{"op": "replace", "path": "/spec/template/spec/containers/0/resources", "value": {"limits": {"memory": "256Mi", "cpu": "250m"}, "requests": {"memory": "128Mi", "cpu": "125m"}}}]' || true
+
+echo "✅ ArgoCD memory configuration applied!"
+
 echo "🚀 Installing Crossplane..."
 kubectl create namespace crossplane-system || true
 helm repo add crossplane-stable https://charts.crossplane.io/stable || true
 helm install crossplane --namespace crossplane-system crossplane-stable/crossplane --version 1.14.5 --wait
-
-echo "🚀 Installing Vault..."
-helm repo add hashicorp https://helm.releases.hashicorp.com || true
-helm install vault hashicorp/vault --namespace default --set "server.dev.enabled=true" --wait
-
-echo "🚀 Installing Vault Secrets Operator..."
-helm install vault-secrets-operator hashicorp/vault-secrets-operator --namespace default --wait
 
 echo "✅ All platform tools installed successfully!"
                 </pre
           >
         </div>
 
-        <!-- Script 3: Configure Vault -->
+        <!-- Script 3: Configure Crossplane -->
         <div id="script3">
           <div class="code-block-title">
-            <span>setup/03-configure-vault.sh</span>
+            <span>setup-scripts/03-configure-crossplane.sh</span>
             <button class="copy-button" onclick="copyCode('script3-code')">
               Copy
             </button>
           </div>
           <pre id="script3-code" class="code-block">
-#!/bin/bash
-set -euo pipefail
-
-echo "🔐 Configuring Vault..."
-
-VAULT_POD="vault-0"
-
-# Wait for Vault to be ready
-kubectl wait --for=condition=Ready pod/${VAULT_POD} --timeout=120s
-
-echo "Enabling Kubernetes auth method in Vault..."
-kubectl exec ${VAULT_POD} -- vault auth enable kubernetes
-
-echo "Configuring Kubernetes auth method..."
-kubectl exec ${VAULT_POD} -- vault write auth/kubernetes/config \
-    kubernetes_host="https://kubernetes.default.svc" \
-    disable_local_ca_jwt="true"
-
-echo "Enabling KV-v2 secrets engine..."
-kubectl exec ${VAULT_POD} -- vault secrets enable -path=kv kv-v2
-
-echo "Creating Vault policy for the app..."
-kubectl exec ${VAULT_POD} -- vault policy write db-pinger-policy - <<EOFpath "kv/data/db-pinger
-  capabilities = ["read"]
-}
-EOF
-
-echo "Creating Vault role for the app's service account..."
-kubectl exec ${VAULT_POD} -- vault write auth/kubernetes/role/db-pinger-role \
-    bound_service_account_names=db-pinger-sa \
-    bound_service_account_namespaces=staging,production \
-    policies=db-pinger-policy \
-    ttl=24h
-
-echo "✅ Vault configured successfully."
-                </pre
-          >
-        </div>
-
-        <!-- Script 4: Configure Crossplane -->
-        <div id="script4">
-          <div class="code-block-title">
-            <span>setup/04-configure-crossplane.sh</span>
-            <button class="copy-button" onclick="copyCode('script4-code')">
-              Copy
-            </button>
-          </div>
-          <pre id="script4-code" class="code-block">
 #!/bin/bash
 set -euo pipefail
 
@@ -410,7 +371,9 @@ spec:
         <!-- App Base: Deployment -->
         <div id="app-dep">
           <div class="code-block-title">
-            <span>infra-manifests/apps/db-pinger/base/deployment.yaml</span>
+            <span
+              >infra-manifests/apps/db-pinger/base/deployment-workshop.yaml</span
+            >
             <button class="copy-button" onclick="copyCode('app-dep-code')">
               Copy
             </button>
@@ -431,11 +394,6 @@ spec:
     metadata:
       labels:
         app: db-pinger
-      annotations:
-        # Vault Secrets Operator annotations
-        vault.hashicorp.com/agent-inject: 'true'
-        vault.hashicorp.com/role: 'db-pinger-role'
-        vault.hashicorp.com/agent-inject-secret-database-creds.txt: 'kv/db-pinger'
     spec:
       serviceAccountName: db-pinger-sa
       containers:
@@ -446,13 +404,12 @@ spec:
           - |
             apk add --no-cache netcat-openbsd;
             echo "--- Starting DB Pinger ---";
-            echo "Waiting for secrets to be injected...";
-            while [ ! -f /vault/secrets/database-creds.txt ]; do sleep 1; done;
-            echo "Secrets found!";
-
-            # Source the secrets file
-            source /vault/secrets/database-creds.txt
-
+            echo "Workshop mode: Using hardcoded values for demonstration";
+            
+            # Use hardcoded values for workshop
+            DB_HOST="localhost"
+            DB_PORT="5432"
+            
             echo "Pinging DB host: $DB_HOST on port $DB_PORT";
 
             # Loop forever, checking the connection
@@ -519,39 +476,6 @@ spec:
           >
         </div>
 
-        <!-- App Base: Vault Secret -->
-        <div id="app-vault-secret">
-          <div class="code-block-title">
-            <span>infra-manifests/apps/db-pinger/base/vault-secret.yaml</span>
-            <button
-              class="copy-button"
-              onclick="copyCode('app-vault-secret-code')"
-            >
-              Copy
-            </button>
-          </div>
-          <pre id="app-vault-secret-code" class="code-block">
-apiVersion: secrets.hashicorp.com/v1beta1
-kind: VaultStaticSecret
-metadata:
-  name: vss-db-pinger
-spec:
-  # This is the role we created in the vault setup script
-  vaultAuthRole: db-pinger-role
-  # Path in Vault where the secret lives
-  mount: kv
-  path: db-pinger
-  type: kv-v2
-  # Name of the k8s secret to sync to
-  destination:
-    name: db-pinger-vault-secret
-    create: true
-  # Refresh the k8s secret from Vault every 60s
-  refreshAfter: 60s
-</pre
-          >
-        </div>
-
         <!-- App Base: Kustomization -->
         <div id="app-kustomize-base">
           <div class="code-block-title">
@@ -566,31 +490,20 @@ spec:
           <pre id="app-kustomize-base-code" class="code-block">
 apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
+
+# All resources are managed through Git
 resources:
-- deployment.yaml
+- deployment-workshop.yaml
 - service.yaml
 - db-claim.yaml
-# - vault-secret.yaml # We will apply this manually later
+- serviceaccount.yaml
 
-# Also create the service account for the app
-generatorOptions:
-  disableNameSuffixHash: true
-secretGenerator:
-- name: db-pinger-conn
-  type: Opaque
-  literals:
-  - username=dummy-user
-  - password=dummy-password
-  - endpoint=dummy-host.example.com
 configMapGenerator:
 - name: db-pinger-config
   literals:
-    - DB_HOST="dummy-host.example.com"
-    - DB_PORT="5432"
-
-# Create a service account for the deployment
-resources:
-- serviceaccount.yaml
+  # These will be overridden by overlays
+  - ENVIRONMENT="base"
+  - LOG_LEVEL="info"
 </pre
           >
         </div>
@@ -733,25 +646,19 @@ patches:
             <strong>Create the Cluster:</strong>
             <p>Make the script executable and run it.</p>
             <pre class="command-block">
-chmod +x setup/01-create-cluster.sh && ./setup/01-create-cluster.sh</pre
+chmod +x setup-scripts/01-create-cluster.sh && ./setup-scripts/01-create-cluster.sh</pre
             >
           </li>
           <li>
             <strong>Install Platform Tools:</strong>
             <pre class="command-block">
-chmod +x setup/02-install-tools.sh && ./setup/02-install-tools.sh</pre
-            >
-          </li>
-          <li>
-            <strong>Configure Vault:</strong>
-            <pre class="command-block">
-chmod +x setup/03-configure-vault.sh && ./setup/03-configure-vault.sh</pre
+chmod +x setup-scripts/02-install-tools.sh && ./setup-scripts/02-install-tools.sh</pre
             >
           </li>
           <li>
             <strong>Configure Crossplane:</strong>
             <pre class="command-block">
-chmod +x setup/04-configure-crossplane.sh && ./setup/04-configure-crossplane.sh</pre
+chmod +x setup-scripts/03-configure-crossplane.sh && ./setup-scripts/03-configure-crossplane.sh</pre
             >
             <p class="mt-2">Wait for the provider to be ready:</p>
             <pre class="command-block">
