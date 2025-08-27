@@ -120,18 +120,17 @@ gitops-workshop/
 ├── setup-scripts/
 │   ├── 01-create-cluster.sh
 │   ├── 02-install-tools.sh
-│   ├── 03-configure-crossplane.sh
+│   ├── 03-setup-database.sh
 │   └── 05-self-healing-demo.sh
 └── infra-manifests/
-    ├── crossplane/
-    │   ├── provider-config.yaml
-    │   └── postgresql-definition.yaml
+    ├── database/
+    │   ├── postgresql.yaml
+    │   └── secrets.yaml
     └── apps/
         └── db-pinger/
             ├── base/
             │   ├── deployment-workshop.yaml
             │   ├── service.yaml
-            │   ├── db-claim.yaml
             │   ├── serviceaccount.yaml
             │   └── kustomization.yaml
             └── overlays/
@@ -241,51 +240,6 @@ echo "✅ All platform tools installed successfully!"
           >
         </div>
 
-        <!-- Script 3: Configure Crossplane -->
-        <div id="script3">
-          <div class="code-block-title">
-            <span>setup-scripts/03-configure-crossplane.sh</span>
-            <button class="copy-button" onclick="copyCode('script3-code')">
-              Copy
-            </button>
-          </div>
-          <pre id="script3-code" class="code-block">
-#!/bin/bash
-set -euo pipefail
-
-echo "✈️ Configuring Crossplane..."
-
-# Note: For a local demo, we use dummy credentials.
-# Crossplane controllers will fail to connect to AWS, but they will still
-# create the Composite Resources and Claims, which is sufficient to
-# demonstrate the GitOps workflow with ArgoCD.
-
-AWS_ACCESS_KEY_ID="DUMMY_KEY_ID"
-AWS_SECRET_ACCESS_KEY="DUMMY_SECRET_KEY"
-
-echo "Creating Kubernetes secret for AWS provider..."
-kubectl create secret generic aws-secret -n crossplane-system \
-  --from-literal=credentials="[default]
-aws_access_key_id = ${AWS_ACCESS_KEY_ID}
-aws_secret_access_key = ${AWS_SECRET_ACCESS_KEY}" \
-  --dry-run=client -o yaml | kubectl apply -f -
-
-echo "Installing Crossplane AWS Provider..."
-cat <<EOF | kubectl apply -f -
-apiVersion: pkg.crossplane.io/v1
-kind: Provider
-metadata:
-  name: provider-aws
-spec:
-  package: xpkg.upbound.io/upbound/provider-aws:v0.47.1
-EOF
-
-echo "✅ Crossplane configured."
-echo "⏳ Note: It may take a few minutes for the AWS provider to become healthy."
-                </pre
-          >
-        </div>
-
         <!-- =================================================================== -->
         <!-- Step 3: Infrastructure Manifests                                    -->
         <!-- =================================================================== -->
@@ -294,76 +248,102 @@ echo "⏳ Note: It may take a few minutes for the AWS provider to become healthy
         </h2>
         <p>These YAML files define our platform and application state.</p>
 
-        <!-- Crossplane Provider Config -->
-        <div id="cp-provider">
+        <!-- Database: PostgreSQL -->
+        <div id="db-postgresql">
           <div class="code-block-title">
-            <span>infra-manifests/crossplane/provider-config.yaml</span>
-            <button class="copy-button" onclick="copyCode('cp-provider-code')">
+            <span>infra-manifests/database/postgresql.yaml</span>
+            <button
+              class="copy-button"
+              onclick="copyCode('db-postgresql-code')"
+            >
               Copy
             </button>
           </div>
-          <pre id="cp-provider-code" class="code-block">
-apiVersion: aws.upbound.io/v1beta1
-kind: ProviderConfig
+          <pre id="db-postgresql-code" class="code-block">
+apiVersion: apps/v1
+kind: Deployment
 metadata:
-  name: default
+  name: postgresql
+  namespace: default
 spec:
-  credentials:
-    source: Secret
-    secretRef:
-      namespace: crossplane-system
-      name: aws-secret
-      key: credentials
+  replicas: 1
+  selector:
+    matchLabels:
+      app: postgresql
+  template:
+    metadata:
+      labels:
+        app: postgresql
+    spec:
+      containers:
+      - name: postgresql
+        image: postgres:14
+        env:
+        - name: POSTGRES_DB
+          value: postgres
+        - name: POSTGRES_USER
+          value: postgres
+        - name: POSTGRES_PASSWORD
+          value: postgres
+        ports:
+        - containerPort: 5432
+        volumeMounts:
+        - name: postgresql-data
+          mountPath: /var/lib/postgresql/data
+      volumes:
+      - name: postgresql-data
+        emptyDir: {}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: postgresql
+  namespace: default
+spec:
+  selector:
+    app: postgresql
+  ports:
+  - protocol: TCP
+    port: 5432
+    targetPort: 5432
 </pre
           >
         </div>
 
-        <!-- Crossplane Definition -->
-        <div id="cp-def">
+        <!-- Database: Secrets -->
+        <div id="db-secrets">
           <div class="code-block-title">
-            <span>infra-manifests/crossplane/postgresql-definition.yaml</span>
-            <button class="copy-button" onclick="copyCode('cp-def-code')">
+            <span>infra-manifests/database/secrets.yaml</span>
+            <button class="copy-button" onclick="copyCode('db-secrets-code')">
               Copy
             </button>
           </div>
-          <pre id="cp-def-code" class="code-block">
-apiVersion: apiextensions.crossplane.io/v1
-kind: CompositeResourceDefinition
+          <pre id="db-secrets-code" class="code-block">
+apiVersion: v1
+kind: Secret
 metadata:
-  name: xpostgresqlinstances.db.example.org
-spec:
-  group: db.example.org
-  names:
-    kind: XPostgreSQLInstance
-    plural: xpostgresqlinstances
-  claimNames:
-    kind: PostgreSQLInstance
-    plural: postgresqlinstances
-  connectionSecretKeys:
-    - username
-    - password
-    - endpoint
-  versions:
-  - name: v1alpha1
-    served: true
-    referenceable: true
-    schema:
-      openAPIV3Schema:
-        type: object
-        properties:
-          spec:
-            type: object
-            properties:
-              parameters:
-                type: object
-                properties:
-                  storageGB:
-                    type: integer
-                    description: "Storage size in GB"
-                required:
-                  - storageGB
-            required:
-              - parameters
+  name: db-pinger-conn
+  namespace: staging
+type: Opaque
+stringData:
+  username: postgres
+  password: postgres
+  endpoint: postgresql.default.svc:5432
+  DB_HOST: postgresql.default.svc
+  DB_PORT: "5432"
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: db-pinger-conn
+  namespace: production
+type: Opaque
+stringData:
+  username: postgres
+  password: postgres
+  endpoint: postgresql.default.svc:5432
+  DB_HOST: postgresql.default.svc
+  DB_PORT: "5432"
 </pre
           >
         </div>
@@ -404,11 +384,11 @@ spec:
           - |
             apk add --no-cache netcat-openbsd;
             echo "--- Starting DB Pinger ---";
-            echo "Workshop mode: Using hardcoded values for demonstration";
+            echo "Connecting to real PostgreSQL database...";
             
-            # Use hardcoded values for workshop
-            DB_HOST="localhost"
-            DB_PORT="5432"
+            # Get database connection details from environment
+            DB_HOST="${DB_HOST:-postgresql.default.svc}"
+            DB_PORT="${DB_PORT:-5432}"
             
             echo "Pinging DB host: $DB_HOST on port $DB_PORT";
 
@@ -424,6 +404,8 @@ spec:
         envFrom:
         - configMapRef:
             name: db-pinger-config
+        - secretRef:
+            name: db-pinger-conn
 </pre
           >
         </div>
@@ -452,30 +434,6 @@ spec:
           >
         </div>
 
-        <!-- App Base: DB Claim -->
-        <div id="app-db-claim">
-          <div class="code-block-title">
-            <span>infra-manifests/apps/db-pinger/base/db-claim.yaml</span>
-            <button class="copy-button" onclick="copyCode('app-db-claim-code')">
-              Copy
-            </button>
-          </div>
-          <pre id="app-db-claim-code" class="code-block">
-apiVersion: db.example.org/v1alpha1
-kind: PostgreSQLInstance
-metadata:
-  name: db-pinger-db
-spec:
-  parameters:
-    storageGB: 20
-  # This tells Crossplane to write the connection secret to a K8s secret
-  # named 'db-pinger-conn' in the same namespace.
-  writeConnectionSecretToRef:
-    name: db-pinger-conn
-</pre
-          >
-        </div>
-
         <!-- App Base: Kustomization -->
         <div id="app-kustomize-base">
           <div class="code-block-title">
@@ -495,7 +453,6 @@ kind: Kustomization
 resources:
 - deployment-workshop.yaml
 - service.yaml
-- db-claim.yaml
 - serviceaccount.yaml
 
 configMapGenerator:
@@ -504,6 +461,8 @@ configMapGenerator:
   # These will be overridden by overlays
   - ENVIRONMENT="base"
   - LOG_LEVEL="info"
+
+# Database connection is provided via db-pinger-conn secret created by setup script
 </pre
           >
         </div>
@@ -521,6 +480,8 @@ apiVersion: v1
 kind: ServiceAccount
 metadata:
   name: db-pinger-sa
+secrets:
+- name: db-pinger-conn
 </pre
           >
         </div>
@@ -656,17 +617,9 @@ chmod +x setup-scripts/02-install-tools.sh && ./setup-scripts/02-install-tools.s
             >
           </li>
           <li>
-            <strong>Configure Crossplane:</strong>
+            <strong>Setup Database:</strong>
             <pre class="command-block">
-chmod +x setup-scripts/03-configure-crossplane.sh && ./setup-scripts/03-configure-crossplane.sh</pre
-            >
-            <p class="mt-2">Wait for the provider to be ready:</p>
-            <pre class="command-block">
-kubectl wait --for=condition=Healthy provider/provider-aws --timeout=5m</pre
-            >
-            <p class="mt-2">Now apply the Crossplane definitions:</p>
-            <pre class="command-block">
-kubectl apply -f infra-manifests/crossplane/</pre
+chmod +x setup-scripts/03-setup-database.sh && ./setup-scripts/03-setup-database.sh</pre
             >
           </li>
           <li>

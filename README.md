@@ -1,15 +1,15 @@
 # GitOps and CloudSecOps Workshop
 
-A hands-on workshop for building a secure, multi-environment platform using GitOps principles with ArgoCD, Crossplane, and Vault.
+A hands-on workshop for building a multi-environment platform using GitOps principles with ArgoCD and Kubernetes.
 
 ## Overview
 
 This workshop demonstrates how to set up a complete GitOps environment locally using:
 
 - **ArgoCD** - GitOps continuous delivery tool
-- **Crossplane** - Cloud-native control plane for infrastructure
 - **Kubernetes** - Container orchestration platform
 - **Kustomize** - Kubernetes native configuration management
+- **PostgreSQL** - Database for self-healing demonstrations
 
 ## Prerequisites
 
@@ -26,11 +26,11 @@ Before starting this workshop, ensure you have the following tools installed:
 gitops-workshop/
 ├── setup-scripts/                  # Setup automation scripts
 │   ├── 01-create-cluster.sh       # Create local Kubernetes cluster
-│   ├── 02-install-tools.sh        # Install ArgoCD, Crossplane
+│   ├── 02-install-tools.sh        # Install ArgoCD
 │   ├── 03-setup-database.sh       # Setup PostgreSQL database
 │   └── 05-self-healing-demo.sh    # Self-healing demonstration
 ├── infra-manifests/                # Infrastructure and application manifests
-│   ├── crossplane/                 # Crossplane definitions
+│   ├── database/                   # Database manifests
 │   └── apps/
 │       └── db-pinger/             # Sample application
 │           ├── base/              # Base application configuration
@@ -66,12 +66,7 @@ gitops-workshop/
    ./setup-scripts/02a-fix-argocd-memory.sh
    ```
 
-3. **Apply Crossplane definitions:**
-   ```bash
-   kubectl apply -f infra-manifests/crossplane/
-   ```
-
-4. **Create namespaces:**
+3. **Create namespaces:**
    ```bash
    kubectl create ns staging production
    ```
@@ -90,7 +85,7 @@ gitops-workshop/
 
 - **GitOps Principles**: Declarative infrastructure management
 - **Multi-Environment Management**: Staging and production with Kustomize
-- **Infrastructure as Code**: Crossplane for cloud resource provisioning
+- **Self-Healing Infrastructure**: Real database connectivity and recovery
 - **Continuous Delivery**: Automated deployments with ArgoCD
 
 ## Workshop Guide

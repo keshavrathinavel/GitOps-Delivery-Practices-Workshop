@@ -22,11 +22,4 @@ kubectl patch deployment argocd-applicationset-controller -n argocd --type='json
 
 echo "✅ ArgoCD memory configuration applied!"
 
-echo "🚀 Installing Crossplane..."
-kubectl create namespace crossplane-system || true
-helm repo add crossplane-stable https://charts.crossplane.io/stable || true
-helm install crossplane --namespace crossplane-system crossplane-stable/crossplane --version 1.14.5 --wait
-
-echo "🚀 Vault removed from workshop - keeping it simple! 🎯"
-
 echo "✅ All platform tools installed successfully!"
