@@ -1,97 +1,121 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>GitOps and CloudSecOps Workshop</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
     <style>
-        body {
-            font-family: 'Inter', sans-serif;
-        }
-        .command-block {
-            background-color: #1f2937;
-            color: #d1d5db;
-            padding: 1rem;
-            border-radius: 0.5rem;            
-            overflow-x: auto;
-            font-family: 'Courier New', Courier, monospace;
-            font-size: 0.875rem;
-            line-height: 1.25rem;
-            /* margin-top: 1rem; */
-            margin-bottom: 1rem;
-        }        
-        .code-block {
-            background-color: #1f2937;
-            color: #d1d5db;
-            padding: 1rem;
-            /* border-radius: 0.5rem; */
-            border-bottom-left-radius: 0.5rem;
-            border-bottom-right-radius: 0.5rem;
-            overflow-x: auto;
-            font-family: 'Courier New', Courier, monospace;
-            font-size: 0.875rem;
-            line-height: 1.25rem;
-            /* margin-top: 1rem; */
-            margin-bottom: 1rem;
-        }
-        .code-block-title {
-            background-color: #374151;
-            color: #e5e7eb;
-            padding: 0.5rem 1rem;
-            border-top-left-radius: 0.5rem;
-            border-top-right-radius: 0.5rem;
-            font-weight: 500;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-        .copy-button {
-            background-color: #4f46e5;
-            color: white;
-            border: none;
-            padding: 0.5rem 1rem;
-            border-radius: 0.375rem;
-            cursor: pointer;
-            font-weight: 500;
-            transition: background-color 0.2s;
-        }
-        .copy-button:hover {
-            background-color: #4338ca;
-        }
-        .pro-tip {
-            background-color: #eef2ff;
-            border-left: 4px solid #4f46e5;
-            padding: 1rem;
-            margin: 1rem 0;
-            border-radius: 0.25rem;
-        }
+      body {
+        font-family: "Inter", sans-serif;
+      }
+      .command-block {
+        background-color: #1f2937;
+        color: #d1d5db;
+        padding: 1rem;
+        border-radius: 0.5rem;
+        overflow-x: auto;
+        font-family: "Courier New", Courier, monospace;
+        font-size: 0.875rem;
+        line-height: 1.25rem;
+        margin-bottom: 1rem;
+      }
+      .code-block {
+        background-color: #1f2937;
+        color: #d1d5db;
+        padding: 1rem;
+        border-bottom-left-radius: 0.5rem;
+        border-bottom-right-radius: 0.5rem;
+        overflow-x: auto;
+        font-family: "Courier New", Courier, monospace;
+        font-size: 0.875rem;
+        line-height: 1.25rem;
+        margin-bottom: 1rem;
+      }
+      .code-block-title {
+        background-color: #374151;
+        color: #e5e7eb;
+        padding: 0.5rem 1rem;
+        border-top-left-radius: 0.5rem;
+        border-top-right-radius: 0.5rem;
+        font-weight: 500;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+      .copy-button {
+        background-color: #4f46e5;
+        color: white;
+        border: none;
+        padding: 0.5rem 1rem;
+        border-radius: 0.375rem;
+        cursor: pointer;
+        font-weight: 500;
+        transition: background-color 0.2s;
+      }
+      .copy-button:hover {
+        background-color: #4338ca;
+      }
+      .pro-tip {
+        background-color: #eef2ff;
+        border-left: 4px solid #4f46e5;
+        padding: 1rem;
+        margin: 1rem 0;
+        border-radius: 0.25rem;
+      }
     </style>
-</head>
-<body class="bg-gray-50 text-gray-800">
+  </head>
+  <body class="bg-gray-50 text-gray-800">
     <div class="container mx-auto p-4 md:p-8">
-        <header class="text-center mb-10">
-            <h1 class="text-4xl font-bold text-gray-900">The Declarative State: A GitOps & CloudSecOps Workshop</h1>
-            <p class="mt-2 text-lg text-gray-600">A hands-on guide to building a secure, multi-environment platform locally.</p>
-        </header>
+      <header class="text-center mb-10">
+        <h1 class="text-4xl font-bold text-gray-900">
+          The Declarative State: A GitOps & CloudSecOps Workshop
+        </h1>
+        <p class="mt-2 text-lg text-gray-600">
+          A hands-on guide to building a secure, multi-environment platform
+          locally.
+        </p>
+      </header>
 
-        <div class="max-w-4xl mx-auto">
-            <h2 class="text-2xl font-semibold mb-4">Introduction</h2>
-            <p class="mb-4">Welcome! This workshop will guide you through setting up a complete GitOps and CloudSecOps environment on your local machine. You will learn how to manage multiple environments (`staging`, `production`) with minimal code duplication and handle secrets securely.</p>
-            <p>The entire "Git repository" for this workshop is simulated by the file structure outlined below. You will create these files on your local machine.</p>
+      <div class="max-w-4xl mx-auto">
+        <h2 class="text-2xl font-semibold mb-4">Introduction</h2>
+        <p class="mb-4">
+          Welcome! This workshop will guide you through setting up a complete
+          GitOps and CloudSecOps environment on your local machine. You will
+          learn how to manage multiple environments (`staging`, `production`)
+          with minimal code duplication and handle secrets securely.
+        </p>
+        <p>
+          The entire "Git repository" for this workshop is simulated by the file
+          structure outlined below. You will create these files on your local
+          machine.
+        </p>
 
-            <div class="pro-tip">
-                <p><strong class="font-semibold">Prerequisites:</strong> Before you start, please ensure you have the following tools installed on your system: <strong>Docker</strong>, <strong>kubectl</strong>, <strong>Helm</strong>, and <strong>kind</strong>.</p>
-            </div>
+        <div class="pro-tip">
+          <p>
+            <strong class="font-semibold">Prerequisites:</strong> Before you
+            start, please ensure you have the following tools installed on your
+            system: <strong>Docker</strong>, <strong>kubectl</strong>,
+            <strong>Helm</strong>, and <strong>kind</strong>.
+          </p>
+        </div>
 
-            <h2 class="text-2xl font-semibold mt-8 mb-4">Step 1: Project Directory Structure</h2>
-            <p class="mb-4">First, create the following directory structure on your local machine. This will simulate our Git repository.</p>
-            <div id="directory-structure">
-                <div class="code-block-title">
-                    <span>Directory Structure</span>
-                </div>
-                <pre id="directory-structure-code" class="code-block">
+        <h2 class="text-2xl font-semibold mt-8 mb-4">
+          Step 1: Project Directory Structure
+        </h2>
+        <p class="mb-4">
+          First, create the following directory structure on your local machine.
+          This will simulate our Git repository.
+        </p>
+        <div id="directory-structure">
+          <div class="code-block-title">
+            <span>Directory Structure</span>
+          </div>
+          <pre id="directory-structure-code" class="code-block">
 gitops-workshop/
 ├── setup/
 │   ├── 01-create-cluster.sh
@@ -117,22 +141,30 @@ gitops-workshop/
                 └── production/
                     ├── configmap.yaml
                     └── kustomization.yaml
-                </pre>
-            </div>
+                </pre
+          >
+        </div>
 
-            <!-- =================================================================== -->
-            <!-- Step 2: Setup Scripts                                               -->
-            <!-- =================================================================== -->
-            <h2 class="text-2xl font-semibold mt-8 mb-4">Step 2: The Setup Scripts</h2>
-            <p>These scripts automate the creation and configuration of your local platform.</p>
+        <!-- =================================================================== -->
+        <!-- Step 2: Setup Scripts                                               -->
+        <!-- =================================================================== -->
+        <h2 class="text-2xl font-semibold mt-8 mb-4">
+          Step 2: The Setup Scripts
+        </h2>
+        <p>
+          These scripts automate the creation and configuration of your local
+          platform.
+        </p>
 
-            <!-- Script 1: Create Cluster -->
-            <div id="script1">
-                <div class="code-block-title">
-                    <span>setup/01-create-cluster.sh</span>
-                    <button class="copy-button" onclick="copyCode('script1-code')">Copy</button>
-                </div>
-                <pre id="script1-code" class="code-block">
+        <!-- Script 1: Create Cluster -->
+        <div id="script1">
+          <div class="code-block-title">
+            <span>setup/01-create-cluster.sh</span>
+            <button class="copy-button" onclick="copyCode('script1-code')">
+              Copy
+            </button>
+          </div>
+          <pre id="script1-code" class="code-block">
 #!/bin/bash
 set -euo pipefail
 
@@ -162,16 +194,19 @@ EOF
 
 echo "✅ Cluster '${CLUSTER_NAME}' created successfully."
 echo "👉 Your kubectl context is now set to 'kind-${CLUSTER_NAME}'"
-                </pre>
-            </div>
+                </pre
+          >
+        </div>
 
-            <!-- Script 2: Install Tools -->
-            <div id="script2">
-                <div class="code-block-title">
-                    <span>setup/02-install-tools.sh</span>
-                    <button class="copy-button" onclick="copyCode('script2-code')">Copy</button>
-                </div>
-                <pre id="script2-code" class="code-block">
+        <!-- Script 2: Install Tools -->
+        <div id="script2">
+          <div class="code-block-title">
+            <span>setup/02-install-tools.sh</span>
+            <button class="copy-button" onclick="copyCode('script2-code')">
+              Copy
+            </button>
+          </div>
+          <pre id="script2-code" class="code-block">
 #!/bin/bash
 set -euo pipefail
 
@@ -193,16 +228,19 @@ echo "🚀 Installing Vault Secrets Operator..."
 helm install vault-secrets-operator hashicorp/vault-secrets-operator --namespace default --wait
 
 echo "✅ All platform tools installed successfully!"
-                </pre>
-            </div>
+                </pre
+          >
+        </div>
 
-            <!-- Script 3: Configure Vault -->
-            <div id="script3">
-                <div class="code-block-title">
-                    <span>setup/03-configure-vault.sh</span>
-                    <button class="copy-button" onclick="copyCode('script3-code')">Copy</button>
-                </div>
-                <pre id="script3-code" class="code-block">
+        <!-- Script 3: Configure Vault -->
+        <div id="script3">
+          <div class="code-block-title">
+            <span>setup/03-configure-vault.sh</span>
+            <button class="copy-button" onclick="copyCode('script3-code')">
+              Copy
+            </button>
+          </div>
+          <pre id="script3-code" class="code-block">
 #!/bin/bash
 set -euo pipefail
 
@@ -225,8 +263,7 @@ echo "Enabling KV-v2 secrets engine..."
 kubectl exec ${VAULT_POD} -- vault secrets enable -path=kv kv-v2
 
 echo "Creating Vault policy for the app..."
-kubectl exec ${VAULT_POD} -- vault policy write db-pinger-policy - <<EOF
-path "kv/data/db-pinger/*" {
+kubectl exec ${VAULT_POD} -- vault policy write db-pinger-policy - <<EOFpath "kv/data/db-pinger
   capabilities = ["read"]
 }
 EOF
@@ -239,16 +276,19 @@ kubectl exec ${VAULT_POD} -- vault write auth/kubernetes/role/db-pinger-role \
     ttl=24h
 
 echo "✅ Vault configured successfully."
-                </pre>
-            </div>
+                </pre
+          >
+        </div>
 
-            <!-- Script 4: Configure Crossplane -->
-            <div id="script4">
-                <div class="code-block-title">
-                    <span>setup/04-configure-crossplane.sh</span>
-                    <button class="copy-button" onclick="copyCode('script4-code')">Copy</button>
-                </div>
-                <pre id="script4-code" class="code-block">
+        <!-- Script 4: Configure Crossplane -->
+        <div id="script4">
+          <div class="code-block-title">
+            <span>setup/04-configure-crossplane.sh</span>
+            <button class="copy-button" onclick="copyCode('script4-code')">
+              Copy
+            </button>
+          </div>
+          <pre id="script4-code" class="code-block">
 #!/bin/bash
 set -euo pipefail
 
@@ -281,22 +321,27 @@ EOF
 
 echo "✅ Crossplane configured."
 echo "⏳ Note: It may take a few minutes for the AWS provider to become healthy."
-                </pre>
-            </div>
+                </pre
+          >
+        </div>
 
-            <!-- =================================================================== -->
-            <!-- Step 3: Infrastructure Manifests                                    -->
-            <!-- =================================================================== -->
-            <h2 class="text-2xl font-semibold mt-8 mb-4">Step 3: Infrastructure & Application Manifests</h2>
-            <p>These YAML files define our platform and application state.</p>
+        <!-- =================================================================== -->
+        <!-- Step 3: Infrastructure Manifests                                    -->
+        <!-- =================================================================== -->
+        <h2 class="text-2xl font-semibold mt-8 mb-4">
+          Step 3: Infrastructure & Application Manifests
+        </h2>
+        <p>These YAML files define our platform and application state.</p>
 
-            <!-- Crossplane Provider Config -->
-            <div id="cp-provider">
-                <div class="code-block-title">
-                    <span>infra-manifests/crossplane/provider-config.yaml</span>
-                    <button class="copy-button" onclick="copyCode('cp-provider-code')">Copy</button>
-                </div>
-                <pre id="cp-provider-code" class="code-block">
+        <!-- Crossplane Provider Config -->
+        <div id="cp-provider">
+          <div class="code-block-title">
+            <span>infra-manifests/crossplane/provider-config.yaml</span>
+            <button class="copy-button" onclick="copyCode('cp-provider-code')">
+              Copy
+            </button>
+          </div>
+          <pre id="cp-provider-code" class="code-block">
 apiVersion: aws.upbound.io/v1beta1
 kind: ProviderConfig
 metadata:
@@ -308,16 +353,19 @@ spec:
       namespace: crossplane-system
       name: aws-secret
       key: credentials
-</pre>
-            </div>
+</pre
+          >
+        </div>
 
-            <!-- Crossplane Definition -->
-            <div id="cp-def">
-                <div class="code-block-title">
-                    <span>infra-manifests/crossplane/postgresql-definition.yaml</span>
-                    <button class="copy-button" onclick="copyCode('cp-def-code')">Copy</button>
-                </div>
-                <pre id="cp-def-code" class="code-block">
+        <!-- Crossplane Definition -->
+        <div id="cp-def">
+          <div class="code-block-title">
+            <span>infra-manifests/crossplane/postgresql-definition.yaml</span>
+            <button class="copy-button" onclick="copyCode('cp-def-code')">
+              Copy
+            </button>
+          </div>
+          <pre id="cp-def-code" class="code-block">
 apiVersion: apiextensions.crossplane.io/v1
 kind: CompositeResourceDefinition
 metadata:
@@ -355,16 +403,19 @@ spec:
                   - storageGB
             required:
               - parameters
-</pre>
-            </div>
+</pre
+          >
+        </div>
 
-            <!-- App Base: Deployment -->
-            <div id="app-dep">
-                <div class="code-block-title">
-                    <span>infra-manifests/apps/db-pinger/base/deployment.yaml</span>
-                    <button class="copy-button" onclick="copyCode('app-dep-code')">Copy</button>
-                </div>
-                <pre id="app-dep-code" class="code-block">
+        <!-- App Base: Deployment -->
+        <div id="app-dep">
+          <div class="code-block-title">
+            <span>infra-manifests/apps/db-pinger/base/deployment.yaml</span>
+            <button class="copy-button" onclick="copyCode('app-dep-code')">
+              Copy
+            </button>
+          </div>
+          <pre id="app-dep-code" class="code-block">
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -416,16 +467,19 @@ spec:
         envFrom:
         - configMapRef:
             name: db-pinger-config
-</pre>
-            </div>
+</pre
+          >
+        </div>
 
-            <!-- App Base: Service -->
-            <div id="app-svc">
-                <div class="code-block-title">
-                    <span>infra-manifests/apps/db-pinger/base/service.yaml</span>
-                    <button class="copy-button" onclick="copyCode('app-svc-code')">Copy</button>
-                </div>
-                <pre id="app-svc-code" class="code-block">
+        <!-- App Base: Service -->
+        <div id="app-svc">
+          <div class="code-block-title">
+            <span>infra-manifests/apps/db-pinger/base/service.yaml</span>
+            <button class="copy-button" onclick="copyCode('app-svc-code')">
+              Copy
+            </button>
+          </div>
+          <pre id="app-svc-code" class="code-block">
 apiVersion: v1
 kind: Service
 metadata:
@@ -437,16 +491,19 @@ spec:
   - protocol: TCP
     port: 80
     targetPort: 8080 # Dummy port, app doesn't serve traffic
-</pre>
-            </div>
+</pre
+          >
+        </div>
 
-            <!-- App Base: DB Claim -->
-            <div id="app-db-claim">
-                <div class="code-block-title">
-                    <span>infra-manifests/apps/db-pinger/base/db-claim.yaml</span>
-                    <button class="copy-button" onclick="copyCode('app-db-claim-code')">Copy</button>
-                </div>
-                <pre id="app-db-claim-code" class="code-block">
+        <!-- App Base: DB Claim -->
+        <div id="app-db-claim">
+          <div class="code-block-title">
+            <span>infra-manifests/apps/db-pinger/base/db-claim.yaml</span>
+            <button class="copy-button" onclick="copyCode('app-db-claim-code')">
+              Copy
+            </button>
+          </div>
+          <pre id="app-db-claim-code" class="code-block">
 apiVersion: db.example.org/v1alpha1
 kind: PostgreSQLInstance
 metadata:
@@ -458,16 +515,22 @@ spec:
   # named 'db-pinger-conn' in the same namespace.
   writeConnectionSecretToRef:
     name: db-pinger-conn
-</pre>
-            </div>
+</pre
+          >
+        </div>
 
-            <!-- App Base: Vault Secret -->
-            <div id="app-vault-secret">
-                <div class="code-block-title">
-                    <span>infra-manifests/apps/db-pinger/base/vault-secret.yaml</span>
-                    <button class="copy-button" onclick="copyCode('app-vault-secret-code')">Copy</button>
-                </div>
-                <pre id="app-vault-secret-code" class="code-block">
+        <!-- App Base: Vault Secret -->
+        <div id="app-vault-secret">
+          <div class="code-block-title">
+            <span>infra-manifests/apps/db-pinger/base/vault-secret.yaml</span>
+            <button
+              class="copy-button"
+              onclick="copyCode('app-vault-secret-code')"
+            >
+              Copy
+            </button>
+          </div>
+          <pre id="app-vault-secret-code" class="code-block">
 apiVersion: secrets.hashicorp.com/v1beta1
 kind: VaultStaticSecret
 metadata:
@@ -485,16 +548,22 @@ spec:
     create: true
   # Refresh the k8s secret from Vault every 60s
   refreshAfter: 60s
-</pre>
-            </div>
+</pre
+          >
+        </div>
 
-            <!-- App Base: Kustomization -->
-            <div id="app-kustomize-base">
-                <div class="code-block-title">
-                    <span>infra-manifests/apps/db-pinger/base/kustomization.yaml</span>
-                    <button class="copy-button" onclick="copyCode('app-kustomize-base-code')">Copy</button>
-                </div>
-                <pre id="app-kustomize-base-code" class="code-block">
+        <!-- App Base: Kustomization -->
+        <div id="app-kustomize-base">
+          <div class="code-block-title">
+            <span>infra-manifests/apps/db-pinger/base/kustomization.yaml</span>
+            <button
+              class="copy-button"
+              onclick="copyCode('app-kustomize-base-code')"
+            >
+              Copy
+            </button>
+          </div>
+          <pre id="app-kustomize-base-code" class="code-block">
 apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 resources:
@@ -522,30 +591,41 @@ configMapGenerator:
 # Create a service account for the deployment
 resources:
 - serviceaccount.yaml
-</pre>
-            </div>
+</pre
+          >
+        </div>
 
-            <!-- App Base: Service Account -->
-            <div id="app-sa-base">
-                <div class="code-block-title">
-                    <span>infra-manifests/apps/db-pinger/base/serviceaccount.yaml</span>
-                    <button class="copy-button" onclick="copyCode('app-sa-base-code')">Copy</button>
-                </div>
-                <pre id="app-sa-base-code" class="code-block">
+        <!-- App Base: Service Account -->
+        <div id="app-sa-base">
+          <div class="code-block-title">
+            <span>infra-manifests/apps/db-pinger/base/serviceaccount.yaml</span>
+            <button class="copy-button" onclick="copyCode('app-sa-base-code')">
+              Copy
+            </button>
+          </div>
+          <pre id="app-sa-base-code" class="code-block">
 apiVersion: v1
 kind: ServiceAccount
 metadata:
   name: db-pinger-sa
-</pre>
-            </div>
+</pre
+          >
+        </div>
 
-            <!-- Overlay Staging: ConfigMap -->
-            <div id="overlay-staging-cm">
-                <div class="code-block-title">
-                    <span>infra-manifests/apps/db-pinger/overlays/staging/configmap.yaml</span>
-                    <button class="copy-button" onclick="copyCode('overlay-staging-cm-code')">Copy</button>
-                </div>
-                <pre id="overlay-staging-cm-code" class="code-block">
+        <!-- Overlay Staging: ConfigMap -->
+        <div id="overlay-staging-cm">
+          <div class="code-block-title">
+            <span
+              >infra-manifests/apps/db-pinger/overlays/staging/configmap.yaml</span
+            >
+            <button
+              class="copy-button"
+              onclick="copyCode('overlay-staging-cm-code')"
+            >
+              Copy
+            </button>
+          </div>
+          <pre id="overlay-staging-cm-code" class="code-block">
 apiVersion: v1
 kind: ConfigMap
 metadata:
@@ -553,16 +633,24 @@ metadata:
 data:
   ENVIRONMENT: "staging"
   LOG_LEVEL: "debug"
-</pre>
-            </div>
+</pre
+          >
+        </div>
 
-            <!-- Overlay Staging: Kustomization -->
-            <div id="overlay-staging-kustomize">
-                <div class="code-block-title">
-                    <span>infra-manifests/apps/db-pinger/overlays/staging/kustomization.yaml</span>
-                    <button class="copy-button" onclick="copyCode('overlay-staging-kustomize-code')">Copy</button>
-                </div>
-                <pre id="overlay-staging-kustomize-code" class="code-block">
+        <!-- Overlay Staging: Kustomization -->
+        <div id="overlay-staging-kustomize">
+          <div class="code-block-title">
+            <span
+              >infra-manifests/apps/db-pinger/overlays/staging/kustomization.yaml</span
+            >
+            <button
+              class="copy-button"
+              onclick="copyCode('overlay-staging-kustomize-code')"
+            >
+              Copy
+            </button>
+          </div>
+          <pre id="overlay-staging-kustomize-code" class="code-block">
 apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 namespace: staging
@@ -574,16 +662,24 @@ patches:
   target:
     kind: ConfigMap
     name: db-pinger-config
-</pre>
-            </div>
+</pre
+          >
+        </div>
 
-            <!-- Overlay Production: ConfigMap -->
-            <div id="overlay-prod-cm">
-                <div class="code-block-title">
-                    <span>infra-manifests/apps/db-pinger/overlays/production/configmap.yaml</span>
-                    <button class="copy-button" onclick="copyCode('overlay-prod-cm-code')">Copy</button>
-                </div>
-                <pre id="overlay-prod-cm-code" class="code-block">
+        <!-- Overlay Production: ConfigMap -->
+        <div id="overlay-prod-cm">
+          <div class="code-block-title">
+            <span
+              >infra-manifests/apps/db-pinger/overlays/production/configmap.yaml</span
+            >
+            <button
+              class="copy-button"
+              onclick="copyCode('overlay-prod-cm-code')"
+            >
+              Copy
+            </button>
+          </div>
+          <pre id="overlay-prod-cm-code" class="code-block">
 apiVersion: v1
 kind: ConfigMap
 metadata:
@@ -591,16 +687,24 @@ metadata:
 data:
   ENVIRONMENT: "production"
   LOG_LEVEL: "info"
-</pre>
-            </div>
+</pre
+          >
+        </div>
 
-            <!-- Overlay Production: Kustomization -->
-            <div id="overlay-prod-kustomize">
-                <div class="code-block-title">
-                    <span>infra-manifests/apps/db-pinger/overlays/production/kustomization.yaml</span>
-                    <button class="copy-button" onclick="copyCode('overlay-prod-kustomize-code')">Copy</button>
-                </div>
-                <pre id="overlay-prod-kustomize-code" class="code-block">
+        <!-- Overlay Production: Kustomization -->
+        <div id="overlay-prod-kustomize">
+          <div class="code-block-title">
+            <span
+              >infra-manifests/apps/db-pinger/overlays/production/kustomization.yaml</span
+            >
+            <button
+              class="copy-button"
+              onclick="copyCode('overlay-prod-kustomize-code')"
+            >
+              Copy
+            </button>
+          </div>
+          <pre id="overlay-prod-kustomize-code" class="code-block">
 apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 namespace: production
@@ -612,49 +716,73 @@ patches:
   target:
     kind: ConfigMap
     name: db-pinger-config
-</pre>
-            </div>
+</pre
+          >
+        </div>
 
+        <!-- =================================================================== -->
+        <!-- Step 4: Workshop Execution                                          -->
+        <!-- =================================================================== -->
+        <h2 class="text-2xl font-semibold mt-8 mb-4">
+          Step 4: Running the Workshop
+        </h2>
+        <p>Execute these commands in order from your terminal.</p>
 
-            <!-- =================================================================== -->
-            <!-- Step 4: Workshop Execution                                          -->
-            <!-- =================================================================== -->
-            <h2 class="text-2xl font-semibold mt-8 mb-4">Step 4: Running the Workshop</h2>
-            <p>Execute these commands in order from your terminal.</p>
-
-            <ol class="list-decimal list-inside space-y-6">
-                <li>
-                    <strong>Create the Cluster:</strong>
-                    <p>Make the script executable and run it.</p>
-                    <pre class="command-block">chmod +x setup/01-create-cluster.sh && ./setup/01-create-cluster.sh</pre>
-                </li>
-                <li>
-                    <strong>Install Platform Tools:</strong>
-                    <pre class="command-block">chmod +x setup/02-install-tools.sh && ./setup/02-install-tools.sh</pre>
-                </li>
-                <li>
-                    <strong>Configure Vault:</strong>
-                    <pre class="command-block">chmod +x setup/03-configure-vault.sh && ./setup/03-configure-vault.sh</pre>
-                </li>
-                <li>
-                    <strong>Configure Crossplane:</strong>
-                    <pre class="command-block">chmod +x setup/04-configure-crossplane.sh && ./setup/04-configure-crossplane.sh</pre>
-                    <p class="mt-2">Wait for the provider to be ready:</p>
-                    <pre class="command-block">kubectl wait --for=condition=Healthy provider/provider-aws --timeout=5m</pre>
-                    <p class="mt-2">Now apply the Crossplane definitions:</p>
-                    <pre class="command-block">kubectl apply -f infra-manifests/crossplane/</pre>
-                </li>
-                <li>
-                    <strong>Deploy the ArgoCD App of Apps (The GitOps Trigger):</strong>
-                    <p class="mt-2">First, create the namespaces.</p>
-                    <pre class="command-block">kubectl create ns staging || true; kubectl create ns production || true</pre>
-                    <p class="mt-2">Now, create the ArgoCD application manifests that point to our Kustomize overlays.</p>
-                    <div id="argocd-apps">
-                        <div class="code-block-title">
-                            <span>argocd-applications.yaml (Apply this file manually)</span>
-                            <button class="copy-button" onclick="copyCode('argocd-apps-code')">Copy</button>
-                        </div>
-                        <pre id="argocd-apps-code" class="code-block">
+        <ol class="list-decimal list-inside space-y-6">
+          <li>
+            <strong>Create the Cluster:</strong>
+            <p>Make the script executable and run it.</p>
+            <pre class="command-block">
+chmod +x setup/01-create-cluster.sh && ./setup/01-create-cluster.sh</pre
+            >
+          </li>
+          <li>
+            <strong>Install Platform Tools:</strong>
+            <pre class="command-block">
+chmod +x setup/02-install-tools.sh && ./setup/02-install-tools.sh</pre
+            >
+          </li>
+          <li>
+            <strong>Configure Vault:</strong>
+            <pre class="command-block">
+chmod +x setup/03-configure-vault.sh && ./setup/03-configure-vault.sh</pre
+            >
+          </li>
+          <li>
+            <strong>Configure Crossplane:</strong>
+            <pre class="command-block">
+chmod +x setup/04-configure-crossplane.sh && ./setup/04-configure-crossplane.sh</pre
+            >
+            <p class="mt-2">Wait for the provider to be ready:</p>
+            <pre class="command-block">
+kubectl wait --for=condition=Healthy provider/provider-aws --timeout=5m</pre
+            >
+            <p class="mt-2">Now apply the Crossplane definitions:</p>
+            <pre class="command-block">
+kubectl apply -f infra-manifests/crossplane/</pre
+            >
+          </li>
+          <li>
+            <strong>Deploy the ArgoCD App of Apps (The GitOps Trigger):</strong>
+            <p class="mt-2">First, create the namespaces.</p>
+            <pre class="command-block">
+kubectl create ns staging || true; kubectl create ns production || true</pre
+            >
+            <p class="mt-2">
+              Now, create the ArgoCD application manifests that point to our
+              Kustomize overlays.
+            </p>
+            <div id="argocd-apps">
+              <div class="code-block-title">
+                <span>argocd-applications.yaml (Apply this file manually)</span>
+                <button
+                  class="copy-button"
+                  onclick="copyCode('argocd-apps-code')"
+                >
+                  Copy
+                </button>
+              </div>
+              <pre id="argocd-apps-code" class="code-block">
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
@@ -692,41 +820,63 @@ spec:
     automated:
       prune: true
       selfHeal: true
-</pre>
-                    </div>
-                    <div class="pro-tip">
-                        <p><strong class="font-semibold">Important:</strong> Before applying the `argocd-applications.yaml` file, you must push your local `gitops-workshop` directory to a real GitHub repository and update the `repoURL` in the file to point to it.</p>
-                    </div>
-                    <pre class="command-block">kubectl apply -f argocd-applications.yaml</pre>
-                </li>
-                <li>
-                    <strong>Access ArgoCD and Observe:</strong>
-                    <p class="mt-2">Get the ArgoCD admin password:</p>
-                    <pre class="command-block">kubectl -n argocd get secret argocd-initial-admin-secret -o jsonpath="{.data.password}" | base64 -d; echo</pre>
-                    <p class="mt-2">Port-forward to the ArgoCD UI:</p>
-                    <pre class="command-block">kubectl port-forward svc/argocd-server -n argocd 8081:443</pre>
-                    <p class="mt-2">Open <a href="https://localhost:8081" target="_blank" class="text-indigo-600 hover:underline">https://localhost:8081</a> in your browser. Log in with username `admin` and the password you just retrieved. You should see your two applications syncing!</p>
-                </li>
-            </ol>
-        </div>
+</pre
+              >
+            </div>
+            <div class="pro-tip">
+              <p>
+                <strong class="font-semibold">Important:</strong> Before
+                applying the `argocd-applications.yaml` file, you must push your
+                local `gitops-workshop` directory to a real GitHub repository
+                and update the `repoURL` in the file to point to it.
+              </p>
+            </div>
+            <pre class="command-block">
+kubectl apply -f argocd-applications.yaml</pre
+            >
+          </li>
+          <li>
+            <strong>Access ArgoCD and Observe:</strong>
+            <p class="mt-2">Get the ArgoCD admin password:</p>
+            <pre class="command-block">
+kubectl -n argocd get secret argocd-initial-admin-secret -o jsonpath="{.data.password}" | base64 -d; echo</pre
+            >
+            <p class="mt-2">Port-forward to the ArgoCD UI:</p>
+            <pre class="command-block">
+kubectl port-forward svc/argocd-server -n argocd 8081:443</pre
+            >
+            <p class="mt-2">
+              Open
+              <a
+                href="https://localhost:8081"
+                target="_blank"
+                class="text-indigo-600 hover:underline"
+                >https://localhost:8081</a
+              >
+              in your browser. Log in with username `admin` and the password you
+              just retrieved. You should see your two applications syncing!
+            </p>
+          </li>
+        </ol>
+      </div>
     </div>
     <script>
-        function copyCode(elementId) {
-            const codeEl = document.getElementById(elementId);
-            const text = codeEl.innerText;
+      function copyCode(elementId) {
+        const codeEl = document.getElementById(elementId);
+        const text = codeEl.innerText;
 
-            const tempTextArea = document.createElement('textarea');
-            tempTextArea.value = text;
-            document.body.appendChild(tempTextArea);
-            tempTextArea.select();
-            try {
-                document.execCommand('copy');
-                // Optional: Show a temporary success message
-            } catch (err) {
-                console.error('Failed to copy text: ', err);
-            }
-            document.body.removeChild(tempTextArea);
+        const tempTextArea = document.createElement("textarea");
+        tempTextArea.value = text;
+        document.body.appendChild(tempTextArea);
+        tempTextArea.select();
+        try {
+          document.execCommand("copy");
+          // Optional: Show a temporary success message
+        } catch (err) {
+          console.error("Failed to copy text: ", err);
         }
+        document.body.removeChild(tempTextArea);
+      }
     </script>
-</body>
+  </body>
 </html>
