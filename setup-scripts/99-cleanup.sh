@@ -61,12 +61,12 @@ kubectl delete application db-pinger-staging -n argocd --ignore-not-found=true
 kubectl delete application db-pinger-production -n argocd --ignore-not-found=true
 
 echo "🗑️  Removing application resources..."
-kubectl delete -k infra-manifests/apps/db-pinger/overlays/staging --ignore-not-found=true
-kubectl delete -k infra-manifests/apps/db-pinger/overlays/production --ignore-not-found=true
+kubectl delete -k ../infra-manifests/apps/db-pinger/overlays/staging --ignore-not-found=true
+kubectl delete -k ../infra-manifests/apps/db-pinger/overlays/production --ignore-not-found=true
 
 echo "🗑️  Removing database resources..."
-kubectl delete -f infra-manifests/database/postgresql.yaml --ignore-not-found=true
-kubectl delete -f infra-manifests/database/secrets.yaml --ignore-not-found=true
+kubectl delete -f ../infra-manifests/database/postgresql.yaml --ignore-not-found=true
+kubectl delete -f ../infra-manifests/database/secrets.yaml --ignore-not-found=true
 
 echo "🗑️  Removing namespaces..."
 kubectl delete namespace staging --ignore-not-found=true
