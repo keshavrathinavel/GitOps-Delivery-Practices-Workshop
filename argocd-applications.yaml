@@ -6,7 +6,7 @@ metadata:
 spec:
   project: default
   source:
-    repoURL: https://github.com/keshavrathinavel/GitOps-Delivery-Practices-Workshop
+    repoURL: https://github.com/keshavrathinavel/GitOps-Delivery-Practices-Workshop # Change this to your repo
     targetRevision: HEAD
     path: infra-manifests/apps/db-pinger/overlays/staging
   destination:
@@ -25,7 +25,7 @@ metadata:
 spec:
   project: default
   source:
-    repoURL: https://github.com/your-username/your-repo.git # CHANGE THIS
+    repoURL: https://github.com/keshavrathinavel/GitOps-Delivery-Practices-Workshop # Change this to your repo
     targetRevision: HEAD
     path: infra-manifests/apps/db-pinger/overlays/production
   destination:
