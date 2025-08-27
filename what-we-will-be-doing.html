@@ -10,16 +10,30 @@
         body {
             font-family: 'Inter', sans-serif;
         }
-        .code-block {
+        .command-block {
             background-color: #1f2937;
             color: #d1d5db;
             padding: 1rem;
-            border-radius: 0.5rem;
+            border-radius: 0.5rem;            
             overflow-x: auto;
             font-family: 'Courier New', Courier, monospace;
             font-size: 0.875rem;
             line-height: 1.25rem;
-            margin-top: 1rem;
+            /* margin-top: 1rem; */
+            margin-bottom: 1rem;
+        }        
+        .code-block {
+            background-color: #1f2937;
+            color: #d1d5db;
+            padding: 1rem;
+            /* border-radius: 0.5rem; */
+            border-bottom-left-radius: 0.5rem;
+            border-bottom-right-radius: 0.5rem;
+            overflow-x: auto;
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 0.875rem;
+            line-height: 1.25rem;
+            /* margin-top: 1rem; */
             margin-bottom: 1rem;
         }
         .code-block-title {
@@ -29,7 +43,6 @@
             border-top-left-radius: 0.5rem;
             border-top-right-radius: 0.5rem;
             font-weight: 500;
-            /* Use flexbox for better alignment */
             display: flex;
             justify-content: space-between;
             align-items: center;
@@ -43,7 +56,6 @@
             cursor: pointer;
             font-weight: 500;
             transition: background-color 0.2s;
-            /* float: right; has been removed */
         }
         .copy-button:hover {
             background-color: #4338ca;
@@ -75,7 +87,11 @@
 
             <h2 class="text-2xl font-semibold mt-8 mb-4">Step 1: Project Directory Structure</h2>
             <p class="mb-4">First, create the following directory structure on your local machine. This will simulate our Git repository.</p>
-            <pre class="code-block">
+            <div id="directory-structure">
+                <div class="code-block-title">
+                    <span>Directory Structure</span>
+                </div>
+                <pre id="directory-structure-code" class="code-block">
 gitops-workshop/
 ├── setup/
 │   ├── 01-create-cluster.sh
@@ -101,7 +117,8 @@ gitops-workshop/
                 └── production/
                     ├── configmap.yaml
                     └── kustomization.yaml
-            </pre>
+                </pre>
+            </div>
 
             <!-- =================================================================== -->
             <!-- Step 2: Setup Scripts                                               -->
@@ -609,28 +626,28 @@ patches:
                 <li>
                     <strong>Create the Cluster:</strong>
                     <p>Make the script executable and run it.</p>
-                    <pre class="code-block">chmod +x setup/01-create-cluster.sh && ./setup/01-create-cluster.sh</pre>
+                    <pre class="command-block">chmod +x setup/01-create-cluster.sh && ./setup/01-create-cluster.sh</pre>
                 </li>
                 <li>
                     <strong>Install Platform Tools:</strong>
-                    <pre class="code-block">chmod +x setup/02-install-tools.sh && ./setup/02-install-tools.sh</pre>
+                    <pre class="command-block">chmod +x setup/02-install-tools.sh && ./setup/02-install-tools.sh</pre>
                 </li>
                 <li>
                     <strong>Configure Vault:</strong>
-                    <pre class="code-block">chmod +x setup/03-configure-vault.sh && ./setup/03-configure-vault.sh</pre>
+                    <pre class="command-block">chmod +x setup/03-configure-vault.sh && ./setup/03-configure-vault.sh</pre>
                 </li>
                 <li>
                     <strong>Configure Crossplane:</strong>
-                    <pre class="code-block">chmod +x setup/04-configure-crossplane.sh && ./setup/04-configure-crossplane.sh</pre>
+                    <pre class="command-block">chmod +x setup/04-configure-crossplane.sh && ./setup/04-configure-crossplane.sh</pre>
                     <p class="mt-2">Wait for the provider to be ready:</p>
-                    <pre class="code-block">kubectl wait --for=condition=Healthy provider/provider-aws --timeout=5m</pre>
+                    <pre class="command-block">kubectl wait --for=condition=Healthy provider/provider-aws --timeout=5m</pre>
                     <p class="mt-2">Now apply the Crossplane definitions:</p>
-                    <pre class="code-block">kubectl apply -f infra-manifests/crossplane/</pre>
+                    <pre class="command-block">kubectl apply -f infra-manifests/crossplane/</pre>
                 </li>
                 <li>
                     <strong>Deploy the ArgoCD App of Apps (The GitOps Trigger):</strong>
                     <p class="mt-2">First, create the namespaces.</p>
-                    <pre class="code-block">kubectl create ns staging || true; kubectl create ns production || true</pre>
+                    <pre class="command-block">kubectl create ns staging || true; kubectl create ns production || true</pre>
                     <p class="mt-2">Now, create the ArgoCD application manifests that point to our Kustomize overlays.</p>
                     <div id="argocd-apps">
                         <div class="code-block-title">
@@ -680,14 +697,14 @@ spec:
                     <div class="pro-tip">
                         <p><strong class="font-semibold">Important:</strong> Before applying the `argocd-applications.yaml` file, you must push your local `gitops-workshop` directory to a real GitHub repository and update the `repoURL` in the file to point to it.</p>
                     </div>
-                    <pre class="code-block">kubectl apply -f argocd-applications.yaml</pre>
+                    <pre class="command-block">kubectl apply -f argocd-applications.yaml</pre>
                 </li>
                 <li>
                     <strong>Access ArgoCD and Observe:</strong>
                     <p class="mt-2">Get the ArgoCD admin password:</p>
-                    <pre class="code-block">kubectl -n argocd get secret argocd-initial-admin-secret -o jsonpath="{.data.password}" | base64 -d; echo</pre>
+                    <pre class="command-block">kubectl -n argocd get secret argocd-initial-admin-secret -o jsonpath="{.data.password}" | base64 -d; echo</pre>
                     <p class="mt-2">Port-forward to the ArgoCD UI:</p>
-                    <pre class="code-block">kubectl port-forward svc/argocd-server -n argocd 8081:443</pre>
+                    <pre class="command-block">kubectl port-forward svc/argocd-server -n argocd 8081:443</pre>
                     <p class="mt-2">Open <a href="https://localhost:8081" target="_blank" class="text-indigo-600 hover:underline">https://localhost:8081</a> in your browser. Log in with username `admin` and the password you just retrieved. You should see your two applications syncing!</p>
                 </li>
             </ol>
