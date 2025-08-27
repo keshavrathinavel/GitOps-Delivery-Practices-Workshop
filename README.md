@@ -4,11 +4,10 @@ A hands-on workshop for building a secure, multi-environment platform using GitO
 
 ## Overview
 
-This workshop demonstrates how to set up a complete GitOps and CloudSecOps environment locally using:
+This workshop demonstrates how to set up a complete GitOps environment locally using:
 
 - **ArgoCD** - GitOps continuous delivery tool
 - **Crossplane** - Cloud-native control plane for infrastructure
-- **Vault** - Secrets management and encryption
 - **Kubernetes** - Container orchestration platform
 - **Kustomize** - Kubernetes native configuration management
 
@@ -25,11 +24,11 @@ Before starting this workshop, ensure you have the following tools installed:
 
 ```
 gitops-workshop/
-├── setup/                          # Setup automation scripts
+├── setup-scripts/                  # Setup automation scripts
 │   ├── 01-create-cluster.sh       # Create local Kubernetes cluster
-│   ├── 02-install-tools.sh        # Install ArgoCD, Crossplane, Vault
-│   ├── 03-configure-vault.sh      # Configure Vault authentication
-│   └── 04-configure-crossplane.sh # Configure Crossplane providers
+│   ├── 02-install-tools.sh        # Install ArgoCD, Crossplane
+│   ├── 03-configure-crossplane.sh # Configure Crossplane providers
+│   └── 05-self-healing-demo.sh    # Self-healing demonstration
 ├── infra-manifests/                # Infrastructure and application manifests
 │   ├── crossplane/                 # Crossplane definitions
 │   └── apps/
@@ -53,16 +52,18 @@ gitops-workshop/
 2. **Run the setup scripts in order:**
    ```bash
    # Create local Kubernetes cluster
-   ./setup/01-create-cluster.sh
+   ./setup-scripts/01-create-cluster.sh
    
-   # Install platform tools
-   ./setup/02-install-tools.sh
-   
-   # Configure Vault
-   ./setup/03-configure-vault.sh
+   # Install platform tools (includes ArgoCD memory fixes)
+   ./setup-scripts/02-install-tools.sh
    
    # Configure Crossplane
-   ./setup/04-configure-crossplane.sh
+   ./setup-scripts/03-configure-crossplane.sh
+   ```
+
+3. **Optional: If you need to fix ArgoCD memory issues later:**
+   ```bash
+   ./setup-scripts/02a-fix-argocd-memory.sh
    ```
 
 3. **Apply Crossplane definitions:**
@@ -89,7 +90,6 @@ gitops-workshop/
 
 - **GitOps Principles**: Declarative infrastructure management
 - **Multi-Environment Management**: Staging and production with Kustomize
-- **Secrets Management**: Secure handling of sensitive data with Vault
 - **Infrastructure as Code**: Crossplane for cloud resource provisioning
 - **Continuous Delivery**: Automated deployments with ArgoCD
 

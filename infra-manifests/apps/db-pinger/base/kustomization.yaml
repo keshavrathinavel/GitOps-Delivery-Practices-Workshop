@@ -3,7 +3,7 @@ kind: Kustomization
 
 # All resources are managed through Git
 resources:
-- deployment.yaml
+- deployment-workshop.yaml
 - service.yaml
 - db-claim.yaml
 - serviceaccount.yaml

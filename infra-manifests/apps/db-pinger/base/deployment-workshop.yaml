@@ -1,0 +1,45 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: db-pinger
+  labels:
+    app: db-pinger
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: db-pinger
+  template:
+    metadata:
+      labels:
+        app: db-pinger
+    spec:
+      serviceAccountName: db-pinger-sa
+      containers:
+      - name: db-pinger
+        image: postgres:14-alpine # Using postgres client as a pinger
+        command: ["/bin/sh", "-c"]
+        args:
+          - |
+            apk add --no-cache netcat-openbsd;
+            echo "--- Starting DB Pinger ---";
+            echo "Workshop mode: Using hardcoded values for demonstration";
+            
+            # Use hardcoded values for workshop
+            DB_HOST="localhost"
+            DB_PORT="5432"
+            
+            echo "Pinging DB host: $DB_HOST on port $DB_PORT";
+
+            # Loop forever, checking the connection
+            while true; do
+              if nc -z -w5 "$DB_HOST" "$DB_PORT"; then
+                echo "SUCCESS: Connection to $DB_HOST:$DB_PORT is open."
+              else
+                echo "FAILURE: Connection to $DB_HOST:$DB_PORT is closed."
+              fi;
+              sleep 10;
+            done
+        envFrom:
+        - configMapRef:
+            name: db-pinger-config
