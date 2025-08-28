@@ -2,9 +2,7 @@
 set -euo pipefail
 
 echo "🚀 Installing or Upgrading ArgoCD..."
-# Use 'helm upgrade --install' to make the script idempotent.
 # This command will install the chart if it's not present, or upgrade it if it is.
-# The --create-namespace flag handles namespace creation, removing the need for a separate kubectl command.
 helm repo add argo https://argoproj.github.io/argo-helm || true
 helm upgrade --install argocd argo/argo-cd \
   --namespace argocd \
