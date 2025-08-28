@@ -62,7 +62,7 @@ force_delete_namespace "production"
 echo "🗑️  Uninstalling ArgoCD Helm release..."
 helm uninstall argocd -n argocd --ignore-not-found=true
 echo "🗑️ Purging ArgoCD resources..."
-kubectl delete crd applications.argoproj.io applicationsets.argoproj.io appprojects.argoproj.io
+kubectl delete crd applications.argoproj.io applicationsets.argoproj.io appprojects.argoproj.io || true
 
 # Also purge the argocd namespace to be absolutely sure
 force_delete_namespace "argocd"
