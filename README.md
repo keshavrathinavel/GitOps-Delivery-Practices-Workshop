@@ -28,7 +28,9 @@ gitops-workshop/
 │   ├── 01-create-cluster.sh       # Create local Kubernetes cluster
 │   ├── 02-install-tools.sh        # Install ArgoCD
 │   ├── 03-setup-database.sh       # Setup PostgreSQL database
+│   ├── 04-create-argocd-applications.sh       # Install ArgoCD applications
 │   └── 05-self-healing-demo.sh    # Self-healing demonstration
+│   └── 99-scleanup.sh             # Cleanup scripts
 ├── infra-manifests/                # Infrastructure and application manifests
 │   ├── database/                   # Database manifests
 │   └── apps/
@@ -53,10 +55,10 @@ gitops-workshop/
    ```bash
    # Create local Kubernetes cluster
    ./setup-scripts/01-create-cluster.sh
-   
+
    # Install platform tools (includes ArgoCD memory fixes)
    ./setup-scripts/02-install-tools.sh
-   
+
    # Setup Database
    ./setup-scripts/03-setup-database.sh
    ```
