@@ -82,6 +82,108 @@
       </header>
 
       <div class="max-w-4xl mx-auto">
+        <div class="mb-12 bg-white p-8 rounded-lg shadow-sm">
+          <h2 class="text-3xl font-bold text-gray-900 mb-6 border-b pb-4">
+            The Core Philosophy: What is GitOps? 🤔
+          </h2>
+          <p class="mb-4 text-gray-700">
+            At its heart, GitOps is a way of managing infrastructure and
+            applications where <strong>Git is the one and only source of
+            truth</strong>. Imagine your entire system's desired state—every
+            application, every piece of infrastructure, every
+            configuration—is described in a Git repository. Specialized software
+            agents running in your cluster are constantly watching this
+            repository. Their only job is to make sure the live system matches
+            what's described in Git.
+          </p>
+
+          <h4 class="text-xl font-semibold mb-3">The Core Principles:</h4>
+          <ul class="list-disc list-inside space-y-2 mb-6 text-gray-700">
+            <li>
+              <strong>Declarative:</strong> Your Git repo contains files (like
+              Kubernetes YAML) that declare the desired state of your system. You
+              say <em>what</em> you want, not <em>how</em> to get there.
+            </li>
+            <li>
+              <strong>Versioned and Immutable:</strong> Git is the source of
+              truth. Every change is a git commit, giving you a complete,
+              auditable history of every change to your system. You can easily
+              see who changed what, when, and why. You can even `git revert` to
+              roll back to a previous state.
+            </li>
+            <li>
+              <strong>Pulled Automatically:</strong> Software agents pull the
+              desired state from Git. This is a crucial security point. You
+              don't push changes from an external system. The cluster itself is
+              responsible for pulling and applying changes, meaning you don't
+              need to give external CI systems direct admin access to your
+              cluster.
+            </li>
+            <li>
+              <strong>Continuously Reconciled:</strong> The agents constantly
+              compare the live state with the desired state in Git. If there's
+              any difference (a "drift"), they automatically fix it. This makes
+              the system self-healing.
+            </li>
+          </ul>
+
+          <h3 class="text-2xl font-semibold mb-4 pt-4 border-t">
+            The Workshop Toolchain Explained 🛠️
+          </h3>
+          <div class="space-y-4 mb-6">
+            <div>
+              <h4 class="text-xl font-semibold">1. ArgoCD: The GitOps Enforcer</h4>
+              <p class="text-gray-700">
+                ArgoCD is the agent that lives in your cluster. It constantly
+                watches your Git repository and compares it to the live state of
+                the cluster. If they don't match, ArgoCD applies the necessary
+                changes. It's the engine of our GitOps workflow.
+              </p>
+            </div>
+            <div>
+              <h4 class="text-xl font-semibold">2. Kustomize: The Environment Customizer</h4>
+              <p class="text-gray-700">
+                Kustomize provides a template-free way to customize application
+                configuration. You define a common `base` set of manifests and
+                then create `overlays` for each environment (e.g., staging,
+                production) that only contain the differences. It's a simple,
+                powerful way to manage multiple environments without duplicating
+                code.
+              </p>
+            </div>
+          </div>
+
+          <h3 class="text-2xl font-semibold mb-4 pt-4 border-t">
+            Essential Kubernetes Concepts 🧠
+          </h3>
+          <div class="space-y-4 text-gray-700">
+            <div>
+              <h4 class="text-xl font-semibold">Context</h4>
+              <p>
+                A context in Kubernetes is a group of access parameters. Each context contains a Kubernetes cluster, a user, and a namespace.
+                The current context is the cluster that is currently the default for kubectl: all kubectl commands run against that cluster.
+                Each of the context that have been used will be available on your .kubeconfig.
+              </p>
+            </div>
+            <div>
+              <h4 class="text-xl font-semibold">Namespaces</h4>
+              <p>
+                Think of them as <strong>virtual clusters</strong> or logical partitions. They
+                are used to organize resources and apply security policies, like
+                separating our <strong>staging</strong> and <strong>production</strong> environments.
+              </p>
+            </div>
+            <div>
+              <h4 class="text-xl font-semibold">CNI (Container Network Interface)</h4>
+              <p>
+                The CNI is the component responsible for networking between your
+                pods. It gives them IP addresses and sets up the necessary
+                routes so they can communicate. For <em>kind</em>, this is handled for
+                you automatically.
+              </p>
+            </div>
+          </div>
+        </div>
         <h2 class="text-2xl font-semibold mb-4">Introduction</h2>
         <p class="mb-4">
           Welcome! This workshop will guide you through setting up a complete
@@ -115,15 +217,18 @@
           <div class="code-block-title">
             <span>Directory Structure</span>
           </div>
-          <pre id="directory-structure-code" class="code-block">
+          <pre
+            id="directory-structure-code"
+            class="code-block"
+          >
 gitops-workshop/
 ├── setup-scripts/
 │   ├── 00-verify-tools.sh
 │   ├── 01-create-cluster.sh
 │   ├── 02-install-tools.sh
 │   ├── 03-setup-database.sh
-│   └── 04-create-argocd-applications.sh
-│   └── 05-self-healing-demo.sh
+│   ├── 04-create-argocd-applications.sh
+│   ├── 05-self-healing-demo.sh
 │   └── 99-cleanup.sh
 └── infra-manifests/
     ├── database/
@@ -143,13 +248,9 @@ gitops-workshop/
                 └── production/
                     ├── configmap.yaml
                     └── kustomization.yaml
-                </pre
-          >
+          </pre>
         </div>
 
-        <!-- =================================================================== -->
-        <!-- Step 2: Setup Scripts                                               -->
-        <!-- =================================================================== -->
         <h2 class="text-2xl font-semibold mt-8 mb-4">
           Step 2: The Setup Scripts
         </h2>
@@ -158,7 +259,6 @@ gitops-workshop/
           platform.
         </p>
 
-        <!-- Script 1: Create Cluster -->
         <div id="script1">
           <div class="code-block-title">
             <span>setup-scripts/01-create-cluster.sh</span>
@@ -182,7 +282,6 @@ echo "👉 Your kubectl context is now set to 'kind-${CLUSTER_NAME}'"
           </pre>
         </div>
 
-        <!-- Script 2: Install Tools -->
         <div id="script2">
           <div class="code-block-title">
             <span>setup-scripts/02-install-tools.sh</span>
@@ -222,15 +321,11 @@ echo "✅ ArgoCD memory configuration applied!"
 echo "✅ All platform tools installed successfully!"</pre>
         </div>
 
-        <!-- =================================================================== -->
-        <!-- Step 3: Infrastructure Manifests                                    -->
-        <!-- =================================================================== -->
         <h2 class="text-2xl font-semibold mt-8 mb-4">
           Step 3: Infrastructure & Application Manifests
         </h2>
         <p>These YAML files define our platform and application state.</p>
 
-        <!-- Database: PostgreSQL -->
         <div id="db-postgresql">
           <div class="code-block-title">
             <span>infra-manifests/database/postgresql.yaml</span>
@@ -291,7 +386,6 @@ spec:
 </pre>
         </div>
 
-        <!-- Database: Secrets -->
         <div id="db-secrets">
           <div class="code-block-title">
             <span>infra-manifests/database/secrets.yaml</span>
@@ -329,7 +423,6 @@ stringData:
           >
         </div>
 
-        <!-- App Base: Deployment -->
         <div id="app-dep">
           <div class="code-block-title">
             <span>infra-manifests/apps/db-pinger/base/deployment.yaml</span>
@@ -389,7 +482,6 @@ spec:
           >
         </div>
 
-        <!-- App Base: Service -->
         <div id="app-svc">
           <div class="code-block-title">
             <span>infra-manifests/apps/db-pinger/base/service.yaml</span>
@@ -413,7 +505,6 @@ spec:
           >
         </div>
 
-        <!-- App Base: Kustomization -->
         <div id="app-kustomize-base">
           <div class="code-block-title">
             <span>infra-manifests/apps/db-pinger/base/kustomization.yaml</span>
@@ -446,7 +537,6 @@ configMapGenerator:
           >
         </div>
 
-        <!-- App Base: Service Account -->
         <div id="app-sa-base">
           <div class="code-block-title">
             <span>infra-manifests/apps/db-pinger/base/serviceaccount.yaml</span>
@@ -465,7 +555,6 @@ secrets:
           >
         </div>
 
-        <!-- Overlay Staging: ConfigMap -->
         <div id="overlay-staging-cm">
           <div class="code-block-title">
             <span
@@ -490,7 +579,6 @@ data:
           >
         </div>
 
-        <!-- Overlay Staging: Kustomization -->
         <div id="overlay-staging-kustomize">
           <div class="code-block-title">
             <span
@@ -519,7 +607,6 @@ patches:
           >
         </div>
 
-        <!-- Overlay Production: ConfigMap -->
         <div id="overlay-prod-cm">
           <div class="code-block-title">
             <span
@@ -544,7 +631,6 @@ data:
           >
         </div>
 
-        <!-- Overlay Production: Kustomization -->
         <div id="overlay-prod-kustomize">
           <div class="code-block-title">
             <span
@@ -573,9 +659,6 @@ patches:
           >
         </div>
 
-        <!-- =================================================================== -->
-        <!-- Step 4: Workshop Execution                                          -->
-        <!-- =================================================================== -->
         <h2 class="text-2xl font-semibold mt-8 mb-4">
           Step 4: Running the Workshop
         </h2>
